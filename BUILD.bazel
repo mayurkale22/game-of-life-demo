@@ -1,0 +1,81 @@
+load("@grpc_java//:java_grpc_library.bzl", "java_grpc_library")
+
+proto_library(
+    name = "game-of-life_proto",
+    srcs = ["src/main/proto/game_of_life.proto"],
+)
+
+java_proto_library(
+    name = "game-of-life_java_proto",
+    deps = [":game-of-life_proto"],
+)
+
+java_grpc_library(
+    name = "game-of-life_java_grpc",
+    srcs = [":game-of-life_proto"],
+    deps = [":game-of-life_java_proto"],
+)
+
+java_library(
+    name = "gameoflife",
+    testonly = 1,
+    srcs = glob(
+        ["src/main/java/**/*.java"],
+    ),
+    resources = glob(
+        ["src/main/resources/**"],
+    ),
+    deps = [
+        ":game-of-life_java_grpc",
+        ":game-of-life_java_proto",
+        "@com_google_api_grpc_proto_google_common_protos//jar",
+        "@com_google_code_findbugs_jsr305//jar",
+        "@com_google_guava_guava//jar",
+        "@com_google_protobuf_java//:protobuf_java",
+        "@com_google_protobuf_java//:protobuf_java_util",
+        "@grpc_java//core",
+        "@grpc_java//protobuf",
+        "@grpc_java//stub",
+        "@com_google_guava//jar",
+        "@io_grpc_services//jar",
+        "@io_opencensus_opencensus_api//jar",
+        "@io_opencensus_opencensus_contrib_grpc_metrics//jar",
+        "@io_opencensus_exporter_stats_stackdriver//jar",
+    ],
+)
+
+java_binary(
+    name = "game-of-life-client",
+    testonly = 1,
+    main_class = "io.opencensus.example.gameoflife.GameOfLifeClient",
+    runtime_deps = [
+        ":gameoflife",
+        "@com_google_api_client_util//jar",
+        "@com_google_api_gax//jar",
+        "@com_google_auth_credentials//jar",
+        "@com_google_auth_oauth2_http//jar",
+        "@com_google_cloud_monitoring//jar",
+        "@com_lmax_disruptor//jar",
+        "@grpc_java//netty",
+        "@io_opencensus_impl//jar",
+        "@io_opencensus_impl_core//jar",
+    ],
+)
+
+java_binary(
+    name = "game-of-life-server",
+    testonly = 1,
+    main_class = "io.opencensus.example.gameoflife.GameOfLifeServer",
+    runtime_deps = [
+        ":gameoflife",
+        "@com_google_api_client_util//jar",
+        "@com_google_api_gax//jar",
+        "@com_google_auth_credentials//jar",
+        "@com_google_auth_oauth2_http//jar",
+        "@com_google_cloud_monitoring//jar",
+        "@com_lmax_disruptor//jar",
+        "@grpc_java//netty",
+        "@io_opencensus_impl//jar",
+        "@io_opencensus_impl_core//jar",
+    ],
+)
