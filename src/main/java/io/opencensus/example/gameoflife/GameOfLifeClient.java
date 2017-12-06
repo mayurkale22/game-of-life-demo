@@ -25,6 +25,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import io.opencensus.common.Duration;
+import io.opencensus.contrib.grpc.metrics.RpcViewConstants;
 import io.opencensus.exporter.stats.stackdriver.StackdriverStatsExporter;
 import io.opencensus.stats.Aggregation.Distribution;
 import io.opencensus.stats.BucketBoundaries;
@@ -65,8 +66,6 @@ final class GameOfLifeClient {
   private final ManagedChannel channel;
   private final CommandProcessorGrpc.CommandProcessorBlockingStub blockingStub;
 
-  // private static Server clientExporter;
-
   /** Construct client connecting to GameOfLife server at {@code host:port}. */
   GameOfLifeClient(String host, int port) {
     this(
@@ -76,14 +75,11 @@ final class GameOfLifeClient {
             .usePlaintext(true));
   }
 
-  /** Construct client for accessing RouteGuide server using the existing channel. */
+  /** Construct client for accessing GameOfLife server using the existing channel. */
   GameOfLifeClient(ManagedChannelBuilder<?> channelBuilder) {
     channel = channelBuilder.build();
     blockingStub = CommandProcessorGrpc.newBlockingStub(channel);
     logger.info("Client channel connected.");
-
-
-    viewManager.registerView(CLIENT_VIEW);
   }
 
   void shutdown() throws InterruptedException {
@@ -97,7 +93,7 @@ final class GameOfLifeClient {
     CommandResponse response;
     try {
       response = blockingStub.execute(request);
-      // Record random stats against client tags.
+      // Record random stats [0, 10) against client tags.
       statsRecorder.newMeasureMap().put(CLIENT_MEASURE, new Random().nextInt(10)).record();
     } catch (StatusRuntimeException e) {
       logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
@@ -107,6 +103,17 @@ final class GameOfLifeClient {
   }
 
   public static void main(String[] args) throws Exception {
+    viewManager.registerView(CLIENT_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_CLIENT_ROUNDTRIP_LATENCY_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_CLIENT_SERVER_ELAPSED_TIME_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_CLIENT_REQUEST_BYTES_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_CLIENT_RESPONSE_BYTES_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_CLIENT_UNCOMPRESSED_REQUEST_BYTES_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_CLIENT_UNCOMPRESSED_RESPONSE_BYTES_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_CLIENT_REQUEST_COUNT_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_CLIENT_RESPONSE_COUNT_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_CLIENT_ERROR_COUNT_VIEW);
+
     try {
       StackdriverStatsExporter.createAndRegisterWithProjectId(
           "opencensus-java-stats-demo-app",

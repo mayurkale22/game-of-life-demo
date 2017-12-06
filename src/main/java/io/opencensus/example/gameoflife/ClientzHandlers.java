@@ -32,7 +32,7 @@ final class ClientzHandlers {
   private static final int STOP_DELAY = 1;
   private static final Logger logger = Logger.getLogger(ClientzHandlers.class.getName());
   private static final String CLIENTZ_URL = "/clientz";
-  private static final ClientzHandler clientzHandler = new ClientzHandler("localhost", 3000, 32);
+  private static final ClientzHandler clientzHandler = new ClientzHandler("localhost", 3000, 10);
 
   private static final Object monitor = new Object();
 

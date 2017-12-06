@@ -82,15 +82,6 @@ final class GameOfLifeServer {
 
   private Server server;
 
-  /** Main launches the server from the command line. */
-  public static void main(String[] args) throws IOException, InterruptedException {
-    logger.info("Server started, monitoring hooks on " + 3000);
-
-    GameOfLifeServer server = new GameOfLifeServer();
-    server.start();
-    server.blockUntilShutdown();
-  }
-
   private static String executeCommand(String command) {
     String[] decode = command.split(" ");
     if (decode.length == 3 && decode[0].equals("gol")) {
@@ -102,7 +93,7 @@ final class GameOfLifeServer {
             .put(SERVER_TAG_KEY, GolUtils.getTagValue(dims, gens, "server"))
             .build();
         try (Scope scopedTags = tagger.withTagContext(ctx)) {
-          // Record some random stats against server tags.
+          // Record some random stats [0, 20) against server tags.
           statsRecorder.newMeasureMap()
               .put(SERVER_MEASURE, new Random().nextInt(20))
               .record();
@@ -116,12 +107,12 @@ final class GameOfLifeServer {
   private void start() throws IOException {
     /* The port on which the server should run */
     server =
-        ServerBuilder.forPort(3001)
+        ServerBuilder.forPort(3000)
             .addService(ProtoReflectionService.newInstance())
             .addService(new CommandProcessorImpl())
             .build()
             .start();
-    logger.info("Server started, listening on " + 3001);
+    logger.info("Server started, listening on " + 3000);
 
     Runtime.getRuntime()
         .addShutdownHook(
@@ -145,13 +136,6 @@ final class GameOfLifeServer {
                 System.err.println("*** server shut down");
               }
             });
-
-    StackdriverStatsExporter.createAndRegisterWithProjectId(
-        "opencensus-java-stats-demo-app",
-        Duration.create(5, 0));
-
-    viewManager.registerView(SERVER_VIEW);
-    viewManager.registerView(SERVER_LATENCY_VIEW);
   }
 
   private void stop() {
@@ -165,6 +149,33 @@ final class GameOfLifeServer {
     if (server != null) {
       server.awaitTermination();
     }
+  }
+
+  /** Main launches the server from the command line. */
+  public static void main(String[] args) throws IOException, InterruptedException {
+    viewManager.registerView(SERVER_VIEW);
+    viewManager.registerView(SERVER_LATENCY_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_SERVER_SERVER_LATENCY_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_SERVER_SERVER_ELAPSED_TIME_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_SERVER_REQUEST_BYTES_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_SERVER_RESPONSE_BYTES_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_SERVER_UNCOMPRESSED_REQUEST_BYTES_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_SERVER_UNCOMPRESSED_RESPONSE_BYTES_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_SERVER_REQUEST_COUNT_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_SERVER_RESPONSE_COUNT_VIEW);
+    viewManager.registerView(RpcViewConstants.RPC_SERVER_ERROR_COUNT_VIEW);
+
+    try {
+      StackdriverStatsExporter.createAndRegisterWithProjectId(
+          "opencensus-java-stats-demo-app",
+          Duration.create(5, 0));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    GameOfLifeServer server = new GameOfLifeServer();
+    server.start();
+    server.blockUntilShutdown();
   }
 
   private static class CommandProcessorImpl extends CommandProcessorGrpc.CommandProcessorImplBase {

@@ -49,8 +49,8 @@ final class ClientzHandler implements HttpHandler {
   @Override
   public void handle(HttpExchange httpExchange) throws IOException {
     try {
-      emitHtml(uriQueryToMap(httpExchange.getRequestURI()), httpExchange.getResponseBody());
       httpExchange.sendResponseHeaders(200, 0);
+      emitHtml(uriQueryToMap(httpExchange.getRequestURI()), httpExchange.getResponseBody());
     } finally {
       httpExchange.close();
     }
@@ -71,7 +71,6 @@ final class ClientzHandler implements HttpHandler {
       } finally {
         printWriter.close();
       }
-      return;
     } finally {
       try {
         client.shutdown();
@@ -140,8 +139,11 @@ final class ClientzHandler implements HttpHandler {
       pw.println("<fieldset>");
       pw.println("<legend>RPC " + getTitle(gol.dim, gensPerGol) + "</legend>");
       pw.println("<ul>");
-      pw.println("<li><strong>Tag:</strong> "
-          + CLIENT_TAG_KEY + ":" + GolUtils.getTagValue(gol.dim, gensPerGol, "client"));
+      pw.println("<li><strong>Tag:</strong> {"
+          + CLIENT_TAG_KEY.getName()
+          + " : "
+          + GolUtils.getTagValue(gol.dim, gensPerGol, "client").asString()
+          + '}');
       pw.println("<li><strong>Dimensions:</strong> " + gol.dim + "x" + gol.dim);
       pw.println("<li><strong>Generations per RPC:</strong> " + gensPerGol);
       pw.println("<li><strong>Result:</strong> ");
