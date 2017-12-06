@@ -21,6 +21,7 @@ import static io.opencensus.example.gameoflife.GameOfLifeApplication.CLIENT_TAG_
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.METHOD;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.ORIGINATOR;
 
+import com.sun.net.httpserver.HttpServer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -37,6 +38,7 @@ import io.opencensus.stats.View.AggregationWindow.Cumulative;
 import io.opencensus.stats.View.Name;
 import io.opencensus.stats.ViewManager;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -62,6 +64,14 @@ final class GameOfLifeClient {
           Distribution.create(BucketBoundaries.create(bucketBoundaries)),
           Arrays.asList(CLIENT_TAG_KEY, CALLER, METHOD, ORIGINATOR),
           CUMULATIVE);
+
+  // The HttpServer listening socket backlog (maximum number of queued incoming connections).
+  private static final int BACKLOG = 5;
+  private static final String CLIENTZ_URL = "/clientz";
+  private static final int CLIENTZ_PORT = 3002;
+  private static final String SERVER_HOST = "localhost";
+  private static final int SERVER_PORT = 3000;
+  private static final int GEN_PER_GOL = 1001;
 
   private final ManagedChannel channel;
   private final CommandProcessorGrpc.CommandProcessorBlockingStub blockingStub;
@@ -122,6 +132,10 @@ final class GameOfLifeClient {
       e.printStackTrace();
     }
 
-    ClientzHandlers.startHttpServerAndRegisterAll(3002);
+    ClientzHandler clientzHandler = new ClientzHandler(SERVER_HOST, SERVER_PORT, GEN_PER_GOL);
+    HttpServer server = HttpServer.create(new InetSocketAddress(CLIENTZ_PORT), BACKLOG);
+    server.createContext(CLIENTZ_URL, clientzHandler);
+    server.start();
+    logger.fine("Clientz HttpServer started on address " + server.getAddress().toString());
   }
 }
