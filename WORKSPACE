@@ -8,28 +8,23 @@ git_repository(
 
 maven_jar(
     name = "io_opencensus_api",
-    artifact = "io.opencensus:opencensus-api:0.10.0",
+    artifact = "io.opencensus:opencensus-api:0.10.1",
 )
 
 maven_jar(
     name = "io_opencensus_impl_core",
-    artifact = "io.opencensus:opencensus-impl-core:0.10.0",
+    artifact = "io.opencensus:opencensus-impl-core:0.10.1",
 )
 
 maven_jar(
     name = "io_opencensus_impl",
-    artifact = "io.opencensus:opencensus-impl:0.10.0",
-)
-
-maven_jar(
-    name = "io_opencensus_contrib_zpages",
-    artifact = "io.opencensus:opencensus-contrib-zpages:0.10.0",
+    artifact = "io.opencensus:opencensus-impl:0.10.1",
 )
 
 
 maven_jar(
     name = "io_opencensus_exporter_stats_stackdriver",
-    artifact = "io.opencensus:opencensus-exporter-stats-stackdriver:0.10.0",
+    artifact = "io.opencensus:opencensus-exporter-stats-stackdriver:0.10.1",
 )
 
 maven_jar(
