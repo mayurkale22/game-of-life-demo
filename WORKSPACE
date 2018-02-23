@@ -3,33 +3,42 @@ workspace(name = "gameoflife")
 git_repository(
     name = "grpc_java",
     remote = "https://github.com/grpc/grpc-java.git",
-    tag = "v1.8.0",
+    tag = "v1.10.0",
 )
 
 maven_jar(
     name = "io_opencensus_api",
-    artifact = "io.opencensus:opencensus-api:0.10.1",
+    artifact = "io.opencensus:opencensus-api:0.12.0",
 )
 
 maven_jar(
     name = "io_opencensus_impl_core",
-    artifact = "io.opencensus:opencensus-impl-core:0.10.1",
+    artifact = "io.opencensus:opencensus-impl-core:0.12.0",
 )
 
 maven_jar(
     name = "io_opencensus_impl",
-    artifact = "io.opencensus:opencensus-impl:0.10.1",
+    artifact = "io.opencensus:opencensus-impl:0.12.0",
 )
-
 
 maven_jar(
     name = "io_opencensus_exporter_stats_stackdriver",
-    artifact = "io.opencensus:opencensus-exporter-stats-stackdriver:0.10.1",
+    artifact = "io.opencensus:opencensus-exporter-stats-stackdriver:0.12.0",
+)
+
+maven_jar(
+    name = "io_opencensus_exporter_trace_stackdriver",
+    artifact = "io.opencensus:opencensus-exporter-trace-stackdriver:0.12.0",
+)
+
+maven_jar(
+    name = "io_opencensus_contrib_zpages",
+    artifact = "io.opencensus:opencensus-contrib-zpages:0.12.0",
 )
 
 maven_jar(
     name = "io_grpc_services",
-    artifact = "io.grpc:grpc-services:1.8.0",
+    artifact = "io.grpc:grpc-services:1.10.0",
 )
 
 maven_jar(
@@ -144,7 +153,7 @@ maven_jar(
 
 maven_jar(
     name = "io_grpc_auth",
-    artifact = "io.grpc:grpc-auth:1.8.0",
+    artifact = "io.grpc:grpc-auth:1.10.0",
 )
 
 load("@grpc_java//:repositories.bzl", "grpc_java_repositories")
