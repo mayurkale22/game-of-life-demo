@@ -72,11 +72,7 @@ final class ClientzHandler implements HttpHandler {
         printWriter.close();
       }
     } finally {
-      try {
-        client.shutdown();
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-      }
+      client.shutdown();
     }
   }
 

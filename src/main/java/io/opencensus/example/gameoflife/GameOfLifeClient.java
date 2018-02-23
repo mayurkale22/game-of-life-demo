@@ -26,7 +26,9 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import io.opencensus.common.Duration;
-import io.opencensus.contrib.grpc.metrics.RpcViewConstants;
+import io.opencensus.contrib.grpc.metrics.RpcViews;
+import io.opencensus.contrib.zpages.ZPageHandlers;
+import io.opencensus.exporter.stats.stackdriver.StackdriverStatsConfiguration;
 import io.opencensus.exporter.stats.stackdriver.StackdriverStatsExporter;
 import io.opencensus.stats.Aggregation.Distribution;
 import io.opencensus.stats.BucketBoundaries;
@@ -37,6 +39,8 @@ import io.opencensus.stats.View;
 import io.opencensus.stats.View.AggregationWindow.Cumulative;
 import io.opencensus.stats.View.Name;
 import io.opencensus.stats.ViewManager;
+import io.opencensus.trace.Tracer;
+import io.opencensus.trace.Tracing;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
@@ -50,6 +54,7 @@ final class GameOfLifeClient {
   private static final Logger logger = Logger.getLogger(GameOfLifeClient.class.getName());
   private static final StatsRecorder statsRecorder = Stats.getStatsRecorder();
   private static final ViewManager viewManager = Stats.getViewManager();
+  private static final Tracer tracer = Tracing.getTracer();
 
   private static final List<Double> bucketBoundaries = Arrays.asList(0.0, 5.0, 10.0, 15.0, 20.0);
   private static final MeasureDouble CLIENT_MEASURE =
@@ -92,10 +97,9 @@ final class GameOfLifeClient {
     logger.info("Client channel connected.");
   }
 
-  void shutdown() throws InterruptedException {
+  void shutdown() {
     logger.info("Client channel shutting down...");
     channel.shutdownNow();
-    GolUtils.printView(viewManager.getView(CLIENT_VIEW_NAME));
   }
 
   String executeCommand(String req) {
@@ -114,22 +118,17 @@ final class GameOfLifeClient {
 
   public static void main(String[] args) throws Exception {
     viewManager.registerView(CLIENT_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_CLIENT_ROUNDTRIP_LATENCY_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_CLIENT_SERVER_ELAPSED_TIME_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_CLIENT_REQUEST_BYTES_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_CLIENT_RESPONSE_BYTES_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_CLIENT_UNCOMPRESSED_REQUEST_BYTES_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_CLIENT_UNCOMPRESSED_RESPONSE_BYTES_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_CLIENT_REQUEST_COUNT_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_CLIENT_RESPONSE_COUNT_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_CLIENT_ERROR_COUNT_VIEW);
+    RpcViews.registerAllViews();
+    ZPageHandlers.startHttpServerAndRegisterAll(9000);
 
     try {
-      StackdriverStatsExporter.createAndRegisterWithProjectId(
-          "opencensus-java-stats-demo-app",
-          Duration.create(5, 0));
+      StackdriverStatsExporter.createAndRegister(
+          StackdriverStatsConfiguration.builder()
+              .setProjectId("opencensus-java-stats-demo-app")
+              .setExportInterval(Duration.create(5, 0))
+              .build());
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.severe("Error when creating Stackdriver Stats Exporter " + e);
     }
 
     ClientzHandler clientzHandler = new ClientzHandler(SERVER_HOST, SERVER_PORT, GEN_PER_GOL);

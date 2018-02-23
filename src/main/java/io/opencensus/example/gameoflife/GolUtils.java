@@ -16,35 +16,10 @@
 
 package io.opencensus.example.gameoflife;
 
-import io.opencensus.stats.AggregationData;
-import io.opencensus.stats.View.AggregationWindow.Interval;
-import io.opencensus.stats.ViewData;
-import io.opencensus.stats.ViewData.AggregationWindowData.CumulativeData;
 import io.opencensus.tags.TagValue;
-import java.util.List;
-import java.util.Map.Entry;
 
 /* Util methods. */
 final class GolUtils {
-
-  static void printView(ViewData viewData) {
-    if (viewData == null) {
-      return;
-    }
-    if (viewData.getView().getWindow() instanceof Interval) {
-      return; // Do not print interval views
-    }
-    CumulativeData cumulativeData = (CumulativeData) viewData.getWindowData();
-    System.out.println(
-        "\nViewData: starts at "
-        + cumulativeData.getStart()
-        + " ends at "
-        + cumulativeData.getEnd());
-    System.out.println("view: " + viewData.getView() + '\n');
-    for (Entry<List<TagValue>, AggregationData> entry : viewData.getAggregationMap().entrySet()) {
-      System.out.println("AggregationData: " + entry.getValue() + '\n');
-    }
-  }
 
   static int toInt(String s) {
     try {

@@ -28,7 +28,9 @@ import io.grpc.stub.StreamObserver;
 import io.opencensus.common.Duration;
 import io.opencensus.common.Scope;
 import io.opencensus.contrib.grpc.metrics.RpcMeasureConstants;
-import io.opencensus.contrib.grpc.metrics.RpcViewConstants;
+import io.opencensus.contrib.grpc.metrics.RpcViews;
+import io.opencensus.contrib.zpages.ZPageHandlers;
+import io.opencensus.exporter.stats.stackdriver.StackdriverStatsConfiguration;
 import io.opencensus.exporter.stats.stackdriver.StackdriverStatsExporter;
 import io.opencensus.stats.Aggregation.Distribution;
 import io.opencensus.stats.BucketBoundaries;
@@ -119,18 +121,6 @@ final class GameOfLifeServer {
             new Thread() {
               @Override
               public void run() {
-                // Print views to console.
-                GolUtils.printView(viewManager.getView(SERVER_VIEW_NAME));
-                GolUtils.printView(viewManager.getView(SERVER_LATENCY_VIEW_NAME));
-                GolUtils.printView(
-                    viewManager.getView(RpcViewConstants.RPC_SERVER_SERVER_LATENCY_VIEW.getName()));
-                GolUtils.printView(
-                    viewManager.getView(RpcViewConstants.RPC_SERVER_REQUEST_BYTES_VIEW.getName()));
-                GolUtils.printView(
-                    viewManager.getView(RpcViewConstants.RPC_SERVER_RESPONSE_BYTES_VIEW.getName()));
-                GolUtils.printView(
-                    viewManager.getView(RpcViewConstants.RPC_SERVER_ERROR_COUNT_VIEW.getName()));
-
                 System.err.println("*** shutting down gRPC server since JVM is shutting down");
                 GameOfLifeServer.this.stop();
                 System.err.println("*** server shut down");
@@ -155,20 +145,15 @@ final class GameOfLifeServer {
   public static void main(String[] args) throws IOException, InterruptedException {
     viewManager.registerView(SERVER_VIEW);
     viewManager.registerView(SERVER_LATENCY_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_SERVER_SERVER_LATENCY_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_SERVER_SERVER_ELAPSED_TIME_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_SERVER_REQUEST_BYTES_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_SERVER_RESPONSE_BYTES_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_SERVER_UNCOMPRESSED_REQUEST_BYTES_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_SERVER_UNCOMPRESSED_RESPONSE_BYTES_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_SERVER_REQUEST_COUNT_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_SERVER_RESPONSE_COUNT_VIEW);
-    viewManager.registerView(RpcViewConstants.RPC_SERVER_ERROR_COUNT_VIEW);
+    RpcViews.registerAllViews();
+    ZPageHandlers.startHttpServerAndRegisterAll(9001);
 
     try {
-      StackdriverStatsExporter.createAndRegisterWithProjectId(
-          "opencensus-java-stats-demo-app",
-          Duration.create(5, 0));
+      StackdriverStatsExporter.createAndRegister(
+          StackdriverStatsConfiguration.builder()
+              .setProjectId("opencensus-java-stats-demo-app")
+              .setExportInterval(Duration.create(5, 0))
+              .build());
     } catch (IOException e) {
       e.printStackTrace();
     }
