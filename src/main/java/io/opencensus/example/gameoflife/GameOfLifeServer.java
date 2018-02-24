@@ -20,6 +20,7 @@ import static io.opencensus.example.gameoflife.GameOfLifeApplication.CALLER;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.CLIENT_TAG_KEY;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.METHOD;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.ORIGINATOR;
+import static io.opencensus.example.gameoflife.GolUtils.getPortOrDefault;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -53,6 +54,8 @@ import java.util.logging.Logger;
 
 final class GameOfLifeServer {
 
+  private final int port;
+
   private static final Logger logger = Logger.getLogger(GameOfLifeServer.class.getName());
   private static final Tagger tagger = Tags.getTagger();
   private static final StatsRecorder statsRecorder = Stats.getStatsRecorder();
@@ -72,7 +75,8 @@ final class GameOfLifeServer {
           Distribution.create(BucketBoundaries.create(bucketBoundaries)),
           Arrays.asList(SERVER_TAG_KEY, CLIENT_TAG_KEY, CALLER, METHOD, ORIGINATOR),
           CUMULATIVE);
-  private static final Name SERVER_LATENCY_VIEW_NAME = Name.create("gol_server_latency_custom_view");
+  private static final Name SERVER_LATENCY_VIEW_NAME = Name
+      .create("gol_server_latency_custom_view");
   private static final View SERVER_LATENCY_VIEW =
       View.create(
           SERVER_LATENCY_VIEW_NAME,
@@ -109,12 +113,12 @@ final class GameOfLifeServer {
   private void start() throws IOException {
     /* The port on which the server should run */
     server =
-        ServerBuilder.forPort(3000)
+        ServerBuilder.forPort(port)
             .addService(ProtoReflectionService.newInstance())
             .addService(new CommandProcessorImpl())
             .build()
             .start();
-    logger.info("Server started, listening on " + 3000);
+    logger.info("Server started, listening on " + port);
 
     Runtime.getRuntime()
         .addShutdownHook(
@@ -134,31 +138,41 @@ final class GameOfLifeServer {
     }
   }
 
-  /** Await termination on the main thread since the grpc library uses daemon threads. */
+  /**
+   * Await termination on the main thread since the grpc library uses daemon threads.
+   */
   private void blockUntilShutdown() throws InterruptedException {
     if (server != null) {
       server.awaitTermination();
     }
   }
 
-  /** Main launches the server from the command line. */
+  GameOfLifeServer(int port) {
+    this.port = port;
+  }
+
+  /**
+   * Main launches the server from the command line.
+   */
   public static void main(String[] args) throws IOException, InterruptedException {
+    int serverPort = getPortOrDefault("serverPort", 3000);
+    int serverZPagePort = getPortOrDefault("zPagePort", 9000);
+    String cloudProjectId = System.getProperty("projectId");
+
     viewManager.registerView(SERVER_VIEW);
     viewManager.registerView(SERVER_LATENCY_VIEW);
     RpcViews.registerAllViews();
-    ZPageHandlers.startHttpServerAndRegisterAll(9001);
+    ZPageHandlers.startHttpServerAndRegisterAll(serverZPagePort);
 
-    try {
+    if (cloudProjectId != null) {
       StackdriverStatsExporter.createAndRegister(
           StackdriverStatsConfiguration.builder()
-              .setProjectId("opencensus-java-stats-demo-app")
+              .setProjectId(cloudProjectId)
               .setExportInterval(Duration.create(5, 0))
               .build());
-    } catch (IOException e) {
-      e.printStackTrace();
     }
 
-    GameOfLifeServer server = new GameOfLifeServer();
+    GameOfLifeServer server = new GameOfLifeServer(serverPort);
     server.start();
     server.blockUntilShutdown();
   }

@@ -20,7 +20,9 @@ import static io.opencensus.example.gameoflife.GameOfLifeApplication.CALLER;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.CLIENT_TAG_KEY;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.METHOD;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.ORIGINATOR;
+import static io.opencensus.example.gameoflife.GolUtils.getPortOrDefault;
 
+import com.google.common.base.MoreObjects;
 import com.sun.net.httpserver.HttpServer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -39,9 +41,6 @@ import io.opencensus.stats.View;
 import io.opencensus.stats.View.AggregationWindow.Cumulative;
 import io.opencensus.stats.View.Name;
 import io.opencensus.stats.ViewManager;
-import io.opencensus.trace.Tracer;
-import io.opencensus.trace.Tracing;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +53,6 @@ final class GameOfLifeClient {
   private static final Logger logger = Logger.getLogger(GameOfLifeClient.class.getName());
   private static final StatsRecorder statsRecorder = Stats.getStatsRecorder();
   private static final ViewManager viewManager = Stats.getViewManager();
-  private static final Tracer tracer = Tracing.getTracer();
 
   private static final List<Double> bucketBoundaries = Arrays.asList(0.0, 5.0, 10.0, 15.0, 20.0);
   private static final MeasureDouble CLIENT_MEASURE =
@@ -73,15 +71,14 @@ final class GameOfLifeClient {
   // The HttpServer listening socket backlog (maximum number of queued incoming connections).
   private static final int BACKLOG = 5;
   private static final String CLIENTZ_URL = "/clientz";
-  private static final int CLIENTZ_PORT = 3002;
-  private static final String SERVER_HOST = "localhost";
-  private static final int SERVER_PORT = 3000;
   private static final int GEN_PER_GOL = 1001;
 
   private final ManagedChannel channel;
   private final CommandProcessorGrpc.CommandProcessorBlockingStub blockingStub;
 
-  /** Construct client connecting to GameOfLife server at {@code host:port}. */
+  /**
+   * Construct client connecting to GameOfLife server at {@code host:port}.
+   */
   GameOfLifeClient(String host, int port) {
     this(
         ManagedChannelBuilder.forAddress(host, port)
@@ -90,7 +87,9 @@ final class GameOfLifeClient {
             .usePlaintext(true));
   }
 
-  /** Construct client for accessing GameOfLife server using the existing channel. */
+  /**
+   * Construct client for accessing GameOfLife server using the existing channel.
+   */
   GameOfLifeClient(ManagedChannelBuilder<?> channelBuilder) {
     channel = channelBuilder.build();
     blockingStub = CommandProcessorGrpc.newBlockingStub(channel);
@@ -117,22 +116,26 @@ final class GameOfLifeClient {
   }
 
   public static void main(String[] args) throws Exception {
+    int clientzPort = getPortOrDefault("clientzPort", 3002);
+    String serverHost = MoreObjects.firstNonNull(System.getProperty("serverHost"), "localhost");
+    int serverPort = getPortOrDefault("serverPort", 3000);
+    int clientZPagePort = getPortOrDefault("zPagePort", 9001);
+    String cloudProjectId = System.getProperty("projectId");
+
     viewManager.registerView(CLIENT_VIEW);
     RpcViews.registerAllViews();
-    ZPageHandlers.startHttpServerAndRegisterAll(9000);
+    ZPageHandlers.startHttpServerAndRegisterAll(clientZPagePort);
 
-    try {
+    if (cloudProjectId != null) {
       StackdriverStatsExporter.createAndRegister(
           StackdriverStatsConfiguration.builder()
-              .setProjectId("opencensus-java-stats-demo-app")
+              .setProjectId(cloudProjectId)
               .setExportInterval(Duration.create(5, 0))
               .build());
-    } catch (IOException e) {
-      logger.severe("Error when creating Stackdriver Stats Exporter " + e);
     }
 
-    ClientzHandler clientzHandler = new ClientzHandler(SERVER_HOST, SERVER_PORT, GEN_PER_GOL);
-    HttpServer server = HttpServer.create(new InetSocketAddress(CLIENTZ_PORT), BACKLOG);
+    ClientzHandler clientzHandler = new ClientzHandler(serverHost, serverPort, GEN_PER_GOL);
+    HttpServer server = HttpServer.create(new InetSocketAddress(clientzPort), BACKLOG);
     server.createContext(CLIENTZ_URL, clientzHandler);
     server.start();
     logger.fine("Clientz HttpServer started on address " + server.getAddress().toString());

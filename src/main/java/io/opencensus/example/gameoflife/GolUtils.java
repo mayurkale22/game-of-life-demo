@@ -17,9 +17,12 @@
 package io.opencensus.example.gameoflife;
 
 import io.opencensus.tags.TagValue;
+import java.util.logging.Logger;
 
 /* Util methods. */
 final class GolUtils {
+
+  private static Logger logger = Logger.getLogger(GolUtils.class.getName());
 
   static int toInt(String s) {
     try {
@@ -35,6 +38,20 @@ final class GolUtils {
 
   static String getRequest(String gen, int gensPerGol) {
     return "gol " + gensPerGol + " " + gen;
+  }
+
+  static int getPortOrDefault(String prop, int defaultPort) {
+    String port = System.getProperty(prop);
+    int portNumber = defaultPort;
+    if (port != null) {
+      try {
+        portNumber = Integer.parseInt(port);
+      } catch (NumberFormatException e) {
+        logger.warning(
+            String.format("Port for %s is invalid, use default port %d.", prop, defaultPort));
+      }
+    }
+    return portNumber;
   }
 
   private GolUtils() {
