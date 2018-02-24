@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, OpenCensus Authors
+ * Copyright 2018, OpenCensus Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * z handler. Displays the game board for game of life.
+ * Clientz handler. Displays the game board for game of life.
  */
+// Cannot extend ZPageHandler since it's package private.
 final class ClientzHandler implements HttpHandler {
   private final String defaultHost;
   private final int defaultPort;
