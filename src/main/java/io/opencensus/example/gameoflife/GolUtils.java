@@ -40,15 +40,14 @@ final class GolUtils {
     return "gol " + gensPerGol + " " + gen;
   }
 
-  static int getPortOrDefault(String prop, int defaultPort) {
-    String port = System.getProperty(prop);
+  static int getPortOrDefaultFromArgs(String[] args, int index, int defaultPort) {
     int portNumber = defaultPort;
-    if (port != null) {
+    if (index < args.length) {
       try {
-        portNumber = Integer.parseInt(port);
+        portNumber = Integer.parseInt(args[index]);
       } catch (NumberFormatException e) {
         logger.warning(
-            String.format("Port for %s is invalid, use default port %d.", prop, defaultPort));
+            String.format("Port %s is invalid, use default port %d.", args[index], defaultPort));
       }
     }
     return portNumber;

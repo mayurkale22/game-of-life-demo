@@ -20,7 +20,7 @@ import static io.opencensus.example.gameoflife.GameOfLifeApplication.CALLER;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.CLIENT_TAG_KEY;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.METHOD;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.ORIGINATOR;
-import static io.opencensus.example.gameoflife.GolUtils.getPortOrDefault;
+import static io.opencensus.example.gameoflife.GolUtils.getPortOrDefaultFromArgs;
 
 import com.google.common.base.MoreObjects;
 import com.sun.net.httpserver.HttpServer;
@@ -116,16 +116,18 @@ final class GameOfLifeClient {
   }
 
   public static void main(String[] args) throws Exception {
-    String serverHost = MoreObjects.firstNonNull(System.getProperty("serverHost"), "localhost");
-    int serverPort = getPortOrDefault("serverPort", 3000);
-    int clientZPagePort = getPortOrDefault("zPagePort", 9001);
-    String cloudProjectId = System.getProperty("projectId");
+    int serverPort = getPortOrDefaultFromArgs(args, 0, 3000);
+    int clientZPagePort = getPortOrDefaultFromArgs(args, 1, 9001);
+    String cloudProjectId = null;
+    if (args.length >= 3) {
+      cloudProjectId = args[2];
+    }
 
     viewManager.registerView(CLIENT_VIEW);
     RpcViews.registerAllViews();
     HttpServer zpageServer = HttpServer.create(new InetSocketAddress(clientZPagePort), BACKLOG);
     ZPageHandlers.registerAllToHttpServer(zpageServer);
-    ClientzHandler clientzHandler = new ClientzHandler(serverHost, serverPort, GEN_PER_GOL);
+    ClientzHandler clientzHandler = new ClientzHandler("localhost", serverPort, GEN_PER_GOL);
     zpageServer.createContext(CLIENTZ_URL, clientzHandler);
     zpageServer.start();
     logger.fine("Clientz HttpServer started on address " + zpageServer.getAddress().toString());

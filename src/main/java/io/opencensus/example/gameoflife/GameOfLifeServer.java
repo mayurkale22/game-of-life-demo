@@ -20,7 +20,7 @@ import static io.opencensus.example.gameoflife.GameOfLifeApplication.CALLER;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.CLIENT_TAG_KEY;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.METHOD;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.ORIGINATOR;
-import static io.opencensus.example.gameoflife.GolUtils.getPortOrDefault;
+import static io.opencensus.example.gameoflife.GolUtils.getPortOrDefaultFromArgs;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -155,9 +155,12 @@ final class GameOfLifeServer {
    * Main launches the server from the command line.
    */
   public static void main(String[] args) throws IOException, InterruptedException {
-    int serverPort = getPortOrDefault("serverPort", 3000);
-    int serverZPagePort = getPortOrDefault("zPagePort", 9000);
-    String cloudProjectId = System.getProperty("projectId");
+    int serverPort = getPortOrDefaultFromArgs(args, 0, 3000);
+    int serverZPagePort = getPortOrDefaultFromArgs(args, 1, 9000);
+    String cloudProjectId = null;
+    if (args.length >= 3) {
+      cloudProjectId = args[2];
+    }
 
     viewManager.registerView(SERVER_VIEW);
     viewManager.registerView(SERVER_LATENCY_VIEW);
