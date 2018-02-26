@@ -116,7 +116,6 @@ final class GameOfLifeClient {
   }
 
   public static void main(String[] args) throws Exception {
-    int clientzPort = getPortOrDefault("clientzPort", 3002);
     String serverHost = MoreObjects.firstNonNull(System.getProperty("serverHost"), "localhost");
     int serverPort = getPortOrDefault("serverPort", 3000);
     int clientZPagePort = getPortOrDefault("zPagePort", 9001);
@@ -124,7 +123,12 @@ final class GameOfLifeClient {
 
     viewManager.registerView(CLIENT_VIEW);
     RpcViews.registerAllViews();
-    ZPageHandlers.startHttpServerAndRegisterAll(clientZPagePort);
+    HttpServer zpageServer = HttpServer.create(new InetSocketAddress(clientZPagePort), BACKLOG);
+    ZPageHandlers.registerAllToHttpServer(zpageServer);
+    ClientzHandler clientzHandler = new ClientzHandler(serverHost, serverPort, GEN_PER_GOL);
+    zpageServer.createContext(CLIENTZ_URL, clientzHandler);
+    zpageServer.start();
+    logger.fine("Clientz HttpServer started on address " + zpageServer.getAddress().toString());
 
     if (cloudProjectId != null) {
       StackdriverStatsExporter.createAndRegister(
@@ -133,11 +137,5 @@ final class GameOfLifeClient {
               .setExportInterval(Duration.create(5, 0))
               .build());
     }
-
-    ClientzHandler clientzHandler = new ClientzHandler(serverHost, serverPort, GEN_PER_GOL);
-    HttpServer server = HttpServer.create(new InetSocketAddress(clientzPort), BACKLOG);
-    server.createContext(CLIENTZ_URL, clientzHandler);
-    server.start();
-    logger.fine("Clientz HttpServer started on address " + server.getAddress().toString());
   }
 }
