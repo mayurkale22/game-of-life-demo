@@ -22,7 +22,6 @@ import static io.opencensus.example.gameoflife.GameOfLifeApplication.METHOD;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.ORIGINATOR;
 import static io.opencensus.example.gameoflife.GolUtils.getPortOrDefaultFromArgs;
 
-import com.google.common.base.MoreObjects;
 import com.sun.net.httpserver.HttpServer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
