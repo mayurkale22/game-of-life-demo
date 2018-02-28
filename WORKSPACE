@@ -3,6 +3,7 @@ workspace(name = "gameoflife")
 opencensus_version = "0.12.0"
 grpc_verion = "1.10.0"
 google_cloud_api_version = "1.23.0"
+prometheus_version = "0.2.0"
 
 git_repository(
     name = "grpc_java",
@@ -26,6 +27,11 @@ maven_jar(
 )
 
 maven_jar(
+    name = "io_opencensus_opencensus_exporter_stats_prometheus",
+    artifact = "io.opencensus:opencensus-exporter-stats-prometheus:" + opencensus_version,
+)
+
+maven_jar(
     name = "io_opencensus_opencensus_exporter_stats_stackdriver",
     artifact = "io.opencensus:opencensus-exporter-stats-stackdriver:" + opencensus_version,
 )
@@ -38,11 +44,6 @@ maven_jar(
 maven_jar(
     name = "io_opencensus_opencensus_contrib_grpc_metrics",
     artifact = "io.opencensus:opencensus-contrib-grpc-metrics:" + opencensus_version,
-)
-
-maven_jar(
-    name = "io_opencensus_opencensus_exporter_stats_prometheus",
-    artifact = "io.opencensus:opencensus-exporter-stats-prometheus:" + opencensus_version,
 )
 
 maven_jar(
@@ -157,17 +158,17 @@ maven_jar(
 
 maven_jar(
     name = "io_prometheus_simpleclient",
-    artifact = "io.prometheus:simpleclient:0.2.0",
+    artifact = "io.prometheus:simpleclient:" + prometheus_version,
 )
 
 maven_jar(
     name = "io_prometheus_simpleclient_httpserver",
-    artifact = "io.prometheus:simpleclient_httpserver:0.2.0",
+    artifact = "io.prometheus:simpleclient_httpserver:" + prometheus_version,
 )
 
 maven_jar(
     name = "io_prometheus_simpleclient_common",
-    artifact = "io.prometheus:simpleclient_common:0.2.0",
+    artifact = "io.prometheus:simpleclient_common:" + prometheus_version,
 )
 
 load("@grpc_java//:repositories.bzl", "grpc_java_repositories")
@@ -196,8 +197,8 @@ grpc_java_repositories(
     omit_io_netty_handler_proxy=False,
     omit_io_netty_resolver=False,
     omit_io_netty_tcnative_boringssl_static=False,
-    omit_io_opencensus_api=True,
-    omit_io_opencensus_grpc_metrics=True,
+    omit_io_opencensus_api=True, # Use the latest OpenCensus version
+    omit_io_opencensus_grpc_metrics=True, # Use the latest OpenCensus version
     omit_junit_junit=False
 )
 
