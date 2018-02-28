@@ -41,6 +41,11 @@ maven_jar(
 )
 
 maven_jar(
+    name = "io_opencensus_opencensus_exporter_stats_prometheus",
+    artifact = "io.opencensus:opencensus-exporter-stats-prometheus:" + opencensus_version,
+)
+
+maven_jar(
     name = "com_lmax_disruptor",
     artifact = "com.lmax:disruptor:3.3.6",
 )
@@ -148,6 +153,21 @@ maven_jar(
 maven_jar(
     name = "io_grpc_auth",
     artifact = "io.grpc:grpc-auth:" + grpc_verion,
+)
+
+maven_jar(
+    name = "io_prometheus_simpleclient",
+    artifact = "io.prometheus:simpleclient:0.2.0",
+)
+
+maven_jar(
+    name = "io_prometheus_simpleclient_httpserver",
+    artifact = "io.prometheus:simpleclient_httpserver:0.2.0",
+)
+
+maven_jar(
+    name = "io_prometheus_simpleclient_common",
+    artifact = "io.prometheus:simpleclient_common:0.2.0",
 )
 
 load("@grpc_java//:repositories.bzl", "grpc_java_repositories")
