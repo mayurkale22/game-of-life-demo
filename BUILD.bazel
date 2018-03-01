@@ -39,6 +39,7 @@ java_library(
         "@io_opencensus_opencensus_contrib_zpages//jar",
         "@io_opencensus_opencensus_exporter_stats_stackdriver//jar",
         "@io_opencensus_opencensus_exporter_stats_prometheus//jar",
+        "@io_opencensus_opencensus_exporter_trace_logging//jar",
         "@io_opencensus_opencensus_exporter_trace_stackdriver//jar",
         "@io_opencensus_opencensus_exporter_trace_zipkin//jar",
         "@io_opencensus_opencensus_contrib_grpc_metrics//jar",

@@ -37,6 +37,11 @@ maven_jar(
 )
 
 maven_jar(
+    name = "io_opencensus_opencensus_exporter_trace_logging",
+    artifact = "io.opencensus:opencensus-exporter-trace-logging:" + opencensus_version,
+)
+
+maven_jar(
     name = "io_opencensus_opencensus_exporter_trace_stackdriver",
     artifact = "io.opencensus:opencensus-exporter-trace-stackdriver:" + opencensus_version,
 )

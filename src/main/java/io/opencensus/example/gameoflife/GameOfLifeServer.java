@@ -34,6 +34,7 @@ import io.opencensus.contrib.zpages.ZPageHandlers;
 import io.opencensus.exporter.stats.prometheus.PrometheusStatsCollector;
 import io.opencensus.exporter.stats.stackdriver.StackdriverStatsConfiguration;
 import io.opencensus.exporter.stats.stackdriver.StackdriverStatsExporter;
+import io.opencensus.exporter.trace.logging.LoggingTraceExporter;
 import io.opencensus.exporter.trace.stackdriver.StackdriverTraceConfiguration;
 import io.opencensus.exporter.trace.stackdriver.StackdriverTraceExporter;
 import io.opencensus.stats.Aggregation.Distribution;
@@ -199,6 +200,7 @@ final class GameOfLifeServer {
     }
 
     // ZipkinTraceExporter.createAndRegister("http://127.0.0.1:9411/api/v2/spans", "Service");
+    LoggingTraceExporter.register();
     PrometheusStatsCollector.createAndRegister();
     HTTPServer prometheusServer = new HTTPServer(prometheusPort, true);
 
