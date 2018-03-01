@@ -51,7 +51,7 @@ localhost:CLIENT_ZPAGE_PORT/tracez
 To view stats and/or spans on server side, go to:  
 localhost:SERVER_ZPAGE_PORT/rpcz  
 localhost:SERVER_ZPAGE_PORT/statsz  
-localhost:CLIENT_ZPAGE_PORT/tracez
+localhost:SERVER_ZPAGE_PORT/tracez
 
 ## View Stats and Spans on Stackdriver Dashboard
 
