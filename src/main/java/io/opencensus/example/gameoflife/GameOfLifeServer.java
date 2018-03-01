@@ -22,7 +22,6 @@ import static io.opencensus.example.gameoflife.GameOfLifeApplication.METHOD;
 import static io.opencensus.example.gameoflife.GameOfLifeApplication.ORIGINATOR;
 import static io.opencensus.example.gameoflife.GolUtils.getPortOrDefaultFromArgs;
 
-import com.google.common.collect.ImmutableList;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.protobuf.services.ProtoReflectionService;
@@ -37,7 +36,6 @@ import io.opencensus.exporter.stats.stackdriver.StackdriverStatsConfiguration;
 import io.opencensus.exporter.stats.stackdriver.StackdriverStatsExporter;
 import io.opencensus.exporter.trace.stackdriver.StackdriverTraceConfiguration;
 import io.opencensus.exporter.trace.stackdriver.StackdriverTraceExporter;
-import io.opencensus.exporter.trace.zipkin.ZipkinTraceExporter;
 import io.opencensus.stats.Aggregation.Distribution;
 import io.opencensus.stats.BucketBoundaries;
 import io.opencensus.stats.Measure.MeasureDouble;
@@ -213,7 +211,7 @@ final class GameOfLifeServer {
 
     @Override
     public void execute(CommandRequest req, StreamObserver<CommandResponse> responseObserver) {
-      // Create one child span on server side for each incoming RPC.
+      // Create one span on server side for each incoming RPC.
       try (Scope scopedSpan =
           tracer.spanBuilder("GolServerSpan").setRecordEvents(true).startScopedSpan()) {
         Span span = tracer.getCurrentSpan();

@@ -41,20 +41,23 @@ localhost:CLIENT_ZPAGE_PORT/clientz
 
 TODO
 
-## View Stats on ZPages
+## View Stats and Spans on ZPages
 
-To view stats on client side, go to:
-localhost:CLIENT_ZPAGE_PORT/rpcz or
+To view stats and/or spans on client side, go to:
+localhost:CLIENT_ZPAGE_PORT/rpcz
 localhost:CLIENT_ZPAGE_PORT/statsz
+localhost:CLIENT_ZPAGE_PORT/tracez
 
-To view stats on server side, go to:
-localhost:SERVER_ZPAGE_PORT/rpcz or
+To view stats and/or spans on server side, go to:
+localhost:SERVER_ZPAGE_PORT/rpcz
 localhost:SERVER_ZPAGE_PORT/statsz
+localhost:CLIENT_ZPAGE_PORT/tracez
 
-## View Stats on Stackdriver Monitoring Dashboard
+## View Stats and Spans on Stackdriver Dashboard
 
 If you specified a valid CLOUD_PROJECT_ID and have the appropriate Google credentials set, stats
-from the Life client and server will also be exported to Stackdriver Monitoring.
+from the Life client and server will be exported to Stackdriver Monitoring, and spans will be
+exported to Stackdriver Trace.
 
 Go to [Stackdriver Monitoring main page](https://app.google.stackdriver.com/), and follow the
 [instructions](https://cloud.google.com/monitoring/charts/) to create a dashboard and charts. Then
@@ -62,5 +65,5 @@ you can view stats from Life application on those charts.
 
 ## View Stats on Prometheus Metrics page
 
-To view both server and client stats on Prometheus metrics page, go to:
+To view both server and client stats on Prometheus metrics page, go to:  
 localhost:PROMETHEUS_PORT/metrics

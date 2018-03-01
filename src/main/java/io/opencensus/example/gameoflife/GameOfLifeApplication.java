@@ -135,7 +135,7 @@ final class GameOfLifeApplication {
       // Create one tag context for each game board.
       try (Scope scopedTags = tagger.withTagContext(ctx)) {
         for (int i = 0; i < numGols; ++i) {
-          // Create one root span on client side for each outgoing RPC.
+          // Create one span on client side for each outgoing RPC.
           SpanBuilder spanBuilder = tracer.spanBuilder("GolClientChildSpan").setRecordEvents(true);
           try (Scope scopedSpan = spanBuilder.startScopedSpan()) {
             Span span = tracer.getCurrentSpan();
