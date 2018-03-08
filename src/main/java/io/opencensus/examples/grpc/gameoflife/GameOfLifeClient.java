@@ -134,6 +134,9 @@ final class GameOfLifeClient {
 
     viewManager.registerView(CLIENT_VIEW);
     RpcViews.registerAllViews();
+    Tracing.getExportComponent().getSampledSpanStore().registerSpanNamesForCollection(
+        Arrays.asList("GolClientSpan", "GolClientChildSpan", "GolServerSpan"));
+
     HttpServer zpageServer = HttpServer.create(new InetSocketAddress(clientZPagePort), BACKLOG);
     ZPageHandlers.registerAllToHttpServer(zpageServer);
     ClientzHandler clientzHandler = new ClientzHandler("localhost", serverPort, GEN_PER_GOL);

@@ -27,6 +27,7 @@ import io.opencensus.trace.SpanBuilder;
 import io.opencensus.trace.Status;
 import io.opencensus.trace.Tracer;
 import io.opencensus.trace.Tracing;
+import io.opencensus.trace.samplers.Samplers;
 
 // Invokes the given GameOfLifeClient for all of the Game-of-Life specs with the appropriate
 // client tag in scope.
@@ -136,7 +137,10 @@ final class GameOfLifeApplication {
       try (Scope scopedTags = tagger.withTagContext(ctx)) {
         for (int i = 0; i < numGols; ++i) {
           // Create one span on client side for each outgoing RPC.
-          SpanBuilder spanBuilder = tracer.spanBuilder("GolClientChildSpan").setRecordEvents(true);
+          SpanBuilder spanBuilder =
+              tracer.spanBuilder("GolClientChildSpan")
+                  .setRecordEvents(true)
+                  .setSampler(Samplers.alwaysSample());
           try (Scope scopedSpan = spanBuilder.startScopedSpan()) {
             Span span = tracer.getCurrentSpan();
             span.addAnnotation("Gol Client sending request to Server.");

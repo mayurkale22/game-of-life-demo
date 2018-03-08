@@ -53,6 +53,7 @@ import io.opencensus.trace.Span;
 import io.opencensus.trace.Status;
 import io.opencensus.trace.Tracer;
 import io.opencensus.trace.Tracing;
+import io.opencensus.trace.samplers.Samplers;
 import io.prometheus.client.exporter.HTTPServer;
 import java.io.IOException;
 import java.util.Arrays;
@@ -170,6 +171,28 @@ final class GameOfLifeServer {
         .registerSpanNamesForCollection(Collections.singletonList("GolServerSpan"));
   }
 
+  private static class CommandProcessorImpl extends CommandProcessorGrpc.CommandProcessorImplBase {
+
+    @Override
+    public void execute(CommandRequest req, StreamObserver<CommandResponse> responseObserver) {
+      // Create one span on server side for each incoming RPC.
+      try (Scope scopedSpan =
+          tracer.spanBuilder("GolServerSpan")
+              .setRecordEvents(true)
+              .setSampler(Samplers.alwaysSample())
+              .startScopedSpan()) {
+        Span span = tracer.getCurrentSpan();
+        span.addAnnotation("Gol Server received request.");
+        CommandResponse reply =
+            CommandResponse.newBuilder().setRetval(executeCommand(req.getReq())).build();
+        span.addAnnotation("Gol Server is sending response.");
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+        span.addAnnotation("Gol Server sent response.");
+      }
+    }
+  }
+
   /**
    * Main launches the server from the command line.
    */
@@ -185,6 +208,9 @@ final class GameOfLifeServer {
     viewManager.registerView(SERVER_VIEW);
     viewManager.registerView(SERVER_LATENCY_VIEW);
     RpcViews.registerAllViews();
+    Tracing.getExportComponent().getSampledSpanStore().registerSpanNamesForCollection(
+        Arrays.asList("GolServerSpan", "GolClientSpan", "GolClientChildSpan"));
+
     ZPageHandlers.startHttpServerAndRegisterAll(serverZPagePort);
 
     if (cloudProjectId != null) {
@@ -205,24 +231,5 @@ final class GameOfLifeServer {
     GameOfLifeServer server = new GameOfLifeServer(serverPort);
     server.start();
     server.blockUntilShutdown();
-  }
-
-  private static class CommandProcessorImpl extends CommandProcessorGrpc.CommandProcessorImplBase {
-
-    @Override
-    public void execute(CommandRequest req, StreamObserver<CommandResponse> responseObserver) {
-      // Create one span on server side for each incoming RPC.
-      try (Scope scopedSpan =
-          tracer.spanBuilder("GolServerSpan").setRecordEvents(true).startScopedSpan()) {
-        Span span = tracer.getCurrentSpan();
-        span.addAnnotation("Gol Server received request.");
-        CommandResponse reply =
-            CommandResponse.newBuilder().setRetval(executeCommand(req.getReq())).build();
-        span.addAnnotation("Gol Server is sending response.");
-        responseObserver.onNext(reply);
-        responseObserver.onCompleted();
-        span.addAnnotation("Gol Server sent response.");
-      }
-    }
   }
 }

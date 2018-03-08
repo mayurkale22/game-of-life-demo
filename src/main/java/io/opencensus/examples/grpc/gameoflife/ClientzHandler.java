@@ -28,6 +28,7 @@ import io.opencensus.trace.Span;
 import io.opencensus.trace.SpanBuilder;
 import io.opencensus.trace.Tracer;
 import io.opencensus.trace.Tracing;
+import io.opencensus.trace.samplers.Samplers;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -62,7 +63,10 @@ final class ClientzHandler implements HttpHandler {
 
   @Override
   public void handle(HttpExchange httpExchange) throws IOException {
-    SpanBuilder spanBuilder = tracer.spanBuilder("GolClientSpan").setRecordEvents(true);
+    SpanBuilder spanBuilder =
+        tracer.spanBuilder("GolClientSpan")
+            .setRecordEvents(true)
+            .setSampler(Samplers.alwaysSample());
     try (Scope scopedSpan = spanBuilder.startScopedSpan()) {
       Span span = tracer.getCurrentSpan();
       span.addAnnotation("Gol Clientz handling request.");
