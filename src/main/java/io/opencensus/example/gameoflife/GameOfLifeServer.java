@@ -24,7 +24,6 @@ import static io.opencensus.example.gameoflife.GolUtils.getPortOrDefaultFromArgs
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import io.grpc.protobuf.services.ProtoReflectionService;
 import io.grpc.stub.StreamObserver;
 import io.opencensus.common.Duration;
 import io.opencensus.common.Scope;
@@ -131,7 +130,6 @@ final class GameOfLifeServer {
     /* The port on which the server should run */
     server =
         ServerBuilder.forPort(port)
-            .addService(ProtoReflectionService.newInstance())
             .addService(new CommandProcessorImpl())
             .build()
             .start();
