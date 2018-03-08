@@ -26,13 +26,33 @@ results.
 
 ## Build and Run the Example
 
+### Gradle
+```bash
+$ ./gradlew installDist
+$ ./build/install/opencensus-game-of-life-example/bin/GameOfLifeServer SERVER_PORT SERVER_ZPAGE_PORT CLOUD_PROJECT_ID PROMETHEUS_PORT
+$ ./build/install/opencensus-game-of-life-example/bin/GameOfLifeClient SERVER_PORT CLIENT_ZPAGE_PORT CLOUD_PROJECT_ID
+```
+
+### Maven
+```bash
+$ mvn package appassembler:assemble
+$ ./target/appassembler/bin/GameOfLifeServer SERVER_PORT SERVER_ZPAGE_PORT CLOUD_PROJECT_ID PROMETHEUS_PORT
+$ ./target/appassembler/bin/GameOfLifeClient SERVER_PORT CLIENT_ZPAGE_PORT CLOUD_PROJECT_ID
+```
+
+### Bazel
 ```bash
 $ bazel build :all
 $ bazel-bin/bazel-bin/game-of-life-server SERVER_PORT SERVER_ZPAGE_PORT CLOUD_PROJECT_ID PROMETHEUS_PORT
 $ bazel-bin/bazel-bin/game-of-life-client SERVER_PORT CLIENT_ZPAGE_PORT CLOUD_PROJECT_ID
 ```
-By default, SERVER_PORT is 3000, SERVER_ZPAGE_PORT is 9000, CLIENT_ZPAGE_PORT is 9001,
-PROMETHEUS_PORT is 10000.
+
+By default,
+* SERVER_PORT is 3000
+* SERVER_ZPAGE_PORT is 9000
+* CLIENT_ZPAGE_PORT is 9001
+* CLOUD_PROJECT_ID is null (which means no stats/spans will be exported to Stackdriver)
+* PROMETHEUS_PORT is 10000
 
 To view the game of life board and play the game, go to:  
 localhost:CLIENT_ZPAGE_PORT/clientz
