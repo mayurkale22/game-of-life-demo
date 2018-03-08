@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package io.opencensus.example.gameoflife;
+package io.opencensus.examples.grpc.gameoflife;
 
-import static io.opencensus.example.gameoflife.GameOfLifeApplication.CLIENT_TAG_KEY;
+import static io.opencensus.examples.grpc.gameoflife.GameOfLifeApplication.CLIENT_TAG_KEY;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import io.opencensus.common.Scope;
-import io.opencensus.example.gameoflife.GameOfLifeApplication.GolSpec;
+import io.opencensus.examples.grpc.gameoflife.GameOfLifeApplication.GolSpec;
 import io.opencensus.trace.Span;
 import io.opencensus.trace.SpanBuilder;
 import io.opencensus.trace.Tracer;

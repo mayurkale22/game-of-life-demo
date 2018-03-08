@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.opencensus.example.gameoflife;
+package io.opencensus.examples.grpc.gameoflife;
 
 /**
  * This class implements Conway's Game of Life. The Game of Life consists of a matrix of cells that

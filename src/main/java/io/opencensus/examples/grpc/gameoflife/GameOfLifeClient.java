@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package io.opencensus.example.gameoflife;
+package io.opencensus.examples.grpc.gameoflife;
 
-import static io.opencensus.example.gameoflife.GameOfLifeApplication.CALLER;
-import static io.opencensus.example.gameoflife.GameOfLifeApplication.CLIENT_TAG_KEY;
-import static io.opencensus.example.gameoflife.GameOfLifeApplication.METHOD;
-import static io.opencensus.example.gameoflife.GameOfLifeApplication.ORIGINATOR;
-import static io.opencensus.example.gameoflife.GolUtils.getPortOrDefaultFromArgs;
+import static io.opencensus.examples.grpc.gameoflife.GameOfLifeApplication.CALLER;
+import static io.opencensus.examples.grpc.gameoflife.GameOfLifeApplication.CLIENT_TAG_KEY;
+import static io.opencensus.examples.grpc.gameoflife.GameOfLifeApplication.METHOD;
+import static io.opencensus.examples.grpc.gameoflife.GameOfLifeApplication.ORIGINATOR;
+import static io.opencensus.examples.grpc.gameoflife.GolUtils.getPortOrDefaultFromArgs;
 
 import com.sun.net.httpserver.HttpServer;
 import io.grpc.ManagedChannel;

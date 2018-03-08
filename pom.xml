@@ -106,11 +106,11 @@
           <programs>
             <program>
               <id>GameOfLifeClient</id>
-              <mainClass>io.opencensus.example.gameoflife.GameOfLifeClient</mainClass>
+              <mainClass>io.opencensus.examples.grpc.gameoflife.GameOfLifeClient</mainClass>
             </program>
             <program>
               <id>GameOfLifeServer</id>
-              <mainClass>io.opencensus.example.gameoflife.GameOfLifeServer</mainClass>
+              <mainClass>io.opencensus.examples.grpc.gameoflife.GameOfLifeServer</mainClass>
             </program>
           </programs>
         </configuration>

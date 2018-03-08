@@ -100,7 +100,7 @@ java_library(
 java_binary(
     name = "game-of-life-client",
     testonly = 1,
-    main_class = "io.opencensus.example.gameoflife.GameOfLifeClient",
+    main_class = "io.opencensus.examples.grpc.gameoflife.GameOfLifeClient",
     runtime_deps = [
         ":gameoflife",
     ],
@@ -109,7 +109,7 @@ java_binary(
 java_binary(
     name = "game-of-life-server",
     testonly = 1,
-    main_class = "io.opencensus.example.gameoflife.GameOfLifeServer",
+    main_class = "io.opencensus.examples.grpc.gameoflife.GameOfLifeServer",
     runtime_deps = [
         ":gameoflife",
     ],

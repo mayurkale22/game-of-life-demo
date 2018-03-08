@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.opencensus.example.gameoflife;
+package io.opencensus.examples.grpc.gameoflife;
 
 import io.opencensus.common.Scope;
 import io.opencensus.tags.TagContext;

@@ -84,14 +84,14 @@ apply plugin: 'application'
 startScripts.enabled = false
 
 task gameOfLifeServer(type: CreateStartScripts) {
-    mainClassName = 'io.opencensus.example.gameoflife.GameOfLifeServer'
+    mainClassName = 'io.opencensus.examples.grpc.gameoflife.GameOfLifeServer'
     applicationName = 'GameOfLifeServer'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = jar.outputs.files + project.configurations.runtime
 }
 
 task gameOfLifeClient(type: CreateStartScripts) {
-    mainClassName = 'io.opencensus.example.gameoflife.GameOfLifeClient'
+    mainClassName = 'io.opencensus.examples.grpc.gameoflife.GameOfLifeClient'
     applicationName = 'GameOfLifeClient'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = jar.outputs.files + project.configurations.runtime
